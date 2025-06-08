@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZEVAR COLLECTION - Jewellery Estimate</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fffde7;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .calculator {
+      max-width: 460px;
+      margin: auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #d4af37;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: linear-gradient(to right, #ffc107, #ffeb3b);
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .price-breakdown {
+      margin-top: 25px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .price-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .final-price {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: right;
+      color: #2e7d32;
+      margin-top: 10px;
+    }
+    .footer {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    @media print {
+      .button {
+        display: none;
+      }
+      body {
+        background: #fff;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h1>ZEVAR COLLECTION</h1>
+
+    <div class="form-group">
+      <label>Customer Name</label>
+      <input type="text" id="customerName" placeholder="Enter customer name" />
+    </div>
+    <div class="form-group">
+      <label>Mobile Number</label>
+      <input type="text" id="customerMobile" placeholder="Enter mobile number" />
+    </div>
+    <div class="form-group">
+      <label>Item Description</label>
+      <input type="text" id="itemDesc" placeholder="e.g. Gold Ring / Silver Pendant" />
+    </div>
+
+    <hr>
+
+    <div class="form-group">
+      <label>Metal Type</label>
+      <select id="metalType" onchange="toggleInputs()">
+        <option value="gold">Gold</option>
+        <option value="silver">Silver</option>
+      </select>
+    </div>
+
+    <div id="goldInputs">
+      <div class="form-group">
+        <label>Gold Rate (per 10g)</label>
+        <input type="number" id="goldRate" placeholder="e.g. 55000" />
+      </div>
+      <div class="form-group">
+        <label>Weight (g)</label>
+        <input type="number" id="goldWeight" placeholder="e.g. 10" />
+      </div>
+      <div class="form-group">
+        <label>Purity</label>
+        <select id="goldPurity">
+          <option value="0.75">18K (750)</option>
+          <option value="0.916">22K (916)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Making Charges (₹/g)</label>
+        <select id="goldMakingCharge">
+          <option value="799">₹799</option>
+          <option value="999" selected>₹999</option>
+          <option value="1199">₹1199</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Discount on Making (%)</label>
+        <input type="number" id="goldDiscount" value="0" />
+      </div>
+    </div>
+
+    <div id="silverInputs" style="display:none;">
+      <div class="form-group">
+        <label>Silver Rate (per 10g)</label>
+        <input type="number" id="silverRate" placeholder="e.g. 600" />
+      </div>
+      <div class="form-group">
+        <label>Weight (g)</label>
+        <input type="number" id="silverWeight" placeholder="e.g. 20" />
+      </div>
+      <div class="form-group">
+        <label>Purity</label>
+        <select id="silverPurity">
+          <option value="0.65">15.6K (650)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Making Charges (₹/g)</label>
+        <select id="silverMakingCharge">
+          <option value="15">₹15</option>
+          <option value="25" selected>₹25</option>
+          <option value="35">₹35</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Discount on Making (%)</label>
+        <input type="number" id="silverDiscount" value="0" />
+      </div>
+    </div>
+
+    <button class="button" onclick="calculate()">Calculate Estimate</button>
+
+    <div id="result" class="price-breakdown" style="display:none;">
+      <div class="price-line"><span>Estimate No:</span><span id="estimateNo"></span></div>
+<div class="price-line" style="font-weight:bold; color: #d4af37;">
+  <span>GST No.:</span><span>09BZVPS9215G1ZJ</span>
+</div>
+      <div class="price-line"><span>Date & Time:</span><span id="dateTime"></span></div>
+      <div class="price-line"><span>Customer:</span><span id="showCustomer"></span></div>
+      <div class="price-line"><span>Mobile:</span><span id="showMobile"></span></div>
+      <div class="price-line"><span>Item:</span><span id="showItem"></span></div>
+      <hr>
+      <div id="goldSection" style="display:none;">
+        <div class="price-line"><span>Gold Rate per gram:</span><span id="rateGram"></span></div>
+        <div class="price-line"><span>Adjusted Rate (Purity):</span><span id="adjustedRate"></span></div>
+        <div class="price-line"><span>Metal Value:</span><span id="metalValue"></span></div>
+        <div class="price-line"><span>Making Charges:</span><span id="makingCharges"></span></div>
+        <div class="price-line"><span>Discount:</span><span id="discountVal"></span></div>
+        <div class="price-line"><span>Subtotal:</span><span id="subtotal"></span></div>
+        <div class="price-line"><span>GST (3%):</span><span id="gst"></span></div>
+        <div class="final-price">Final Estimate: ₹<span id="finalPrice"></span></div>
+      </div>
+
+      <div id="silverSection" style="display:none;">
+        <div class="price-line"><span>Silver Rate per gram:</span><span id="silverRateGram"></span></div>
+        <div class="price-line"><span>Adjusted Rate (Purity):</span><span id="silverAdjustedRate"></span></div>
+        <div class="price-line"><span>Metal Value:</span><span id="silverMetalValue"></span></div>
+        <div class="price-line"><span>Making Charges:</span><span id="silverMakingCharges"></span></div>
+        <div class="price-line"><span>Discount:</span><span id="silverDiscountVal"></span></div>
+        <div class="price-line"><span>Subtotal:</span><span id="silverSubtotal"></span></div>
+        <div class="price-line"><span>GST (3%):</span><span id="silverGst"></span></div>
+        <div class="final-price">Final Estimate: ₹<span id="silverFinalPrice"></span></div>
+      </div>
+
+      <button class="button" onclick="window.print()">🖨️ Print Price Breakdown</button>
+
+
+      <div class="footer">
+        Thank you for choosing <span style="color:#d4af37;">ZEVAR COLLECTION</span><br />
+        "Sagai Se Vidai Tak – Aapka Bharosemand Royal Jewellery Brand"
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleInputs() {
+      const metal = document.getElementById('metalType').value;
+      if (metal === 'gold') {
+        document.getElementById('goldInputs').style.display = 'block';
+        document.getElementById('silverInputs').style.display = 'none';
+        document.getElementById('goldSection').style.display = 'block';
+        document.getElementById('silverSection').style.display = 'none';
+      } else {
+        document.getElementById('goldInputs').style.display = 'none';
+        document.getElementById('silverInputs').style.display = 'block';
+        document.getElementById('goldSection').style.display = 'none';
+        document.getElementById('silverSection').style.display = 'block';
+      }
+    }
+
+    function calculate() {
+      const name = document.getElementById("customerName").value.trim();
+      const mobile = document.getElementById("customerMobile").value.trim();
+      const item = document.getElementById("itemDesc").value.trim();
+      const metal = document.getElementById("metalType").value;
+
+      if (!name || !mobile || !item) {
+        alert("Please fill Customer Name, Mobile, and Item Description.");
+        return;
+      }
+
+      const now = new Date();
+      const estimateNo = "EST-" + now.getTime().toString().slice(-6);
+      const dateTime = now.toLocaleString();
+
+      document.getElementById("estimateNo").textContent = estimateNo;
+      document.getElementById("dateTime").textContent = dateTime;
+      document.getElementById("showCustomer").textContent = name;
+      document.getElementById("showMobile").textContent = mobile;
+      document.getElementById("showItem").textContent = item;
+
+      if (metal === "gold") {
+        const rate10 = parseFloat(document.getElementById("goldRate").value);
+        const weight = parseFloat(document.getElementById("goldWeight").value);
+        const purity = parseFloat(document.getElementById("goldPurity").value);
+        const making = parseFloat(document.getElementById("goldMakingCharge").value);
+        const discount = parseFloat(document.getElementById("goldDiscount").value);
+
+        if (!rate10 || !weight || weight <= 0) {
+          alert("Please enter valid Gold Rate and Weight.");
+          return;
+        }
+
+        const ratePerGram = rate10 / 10;
+        const adjRate = ratePerGram * purity;
+        const metalValue = adjRate * weight;
+        const makingCharge = making * weight;
+        const discountVal = (discount / 100) * makingCharge;
+        const netMaking = makingCharge - discountVal;
+        const subtotal = metalValue + netMaking;
+        const gst = subtotal * 0.03;
+        const finalPrice = subtotal + gst;
+
+        document.getElementById("rateGram").textContent = `₹${ratePerGram.toFixed(2)}`;
+        document.getElementById("adjustedRate").textContent = `₹${adjRate.toFixed(2)}`;
+        document.getElementById("metalValue").textContent = `₹${metalValue.toFixed(2)}`;
+        document.getElementById("makingCharges").textContent = `₹${makingCharge.toFixed(2)}`;
+        document.getElementById("discountVal").textContent = `-₹${discountVal.toFixed(2)}`;
+        document.getElementById("subtotal").textContent = `₹${subtotal.toFixed(2)}`;
+        document.getElementById("gst").textContent = `₹${gst.toFixed(2)}`;
+        document.getElementById("finalPrice").textContent = finalPrice.toFixed(2);
+      } else {
+        // Silver
+        const rate10 = parseFloat(document.getElementById("silverRate").value);
+        const weight = parseFloat(document.getElementById("silverWeight").value);
+        const purity = parseFloat(document.getElementById("silverPurity").value);
+        const making = parseFloat(document.getElementById("silverMakingCharge").value);
+        const discount = parseFloat(document.getElementById("silverDiscount").value);
+
+        if (!rate10 || !weight || weight <= 0) {
+          alert("Please enter valid Silver Rate and Weight.");
+          return;
+        }
+
+        const ratePerGram = rate10 / 10;
+        const adjRate = ratePerGram * purity;
+        const metalValue = adjRate * weight;
+        const makingCharge = making * weight;
+        const discountVal = (discount / 100) * makingCharge;
+        const netMaking = makingCharge - discountVal;
+        const subtotal = metalValue + netMaking;
+        const gst = subtotal * 0.03;
+        const finalPrice = subtotal + gst;
+
+        document.getElementById("silverRateGram").textContent = `₹${ratePerGram.toFixed(2)}`;
+        document.getElementById("silverAdjustedRate").textContent = `₹${adjRate.toFixed(2)}`;
+        document.getElementById("silverMetalValue").textContent = `₹${metalValue.toFixed(2)}`;
+        document.getElementById("silverMakingCharges").textContent = `₹${makingCharge.toFixed(2)}`;
+        document.getElementById("silverDiscountVal").textContent = `-₹${discountVal.toFixed(2)}`;
+        document.getElementById("silverSubtotal").textContent = `₹${subtotal.toFixed(2)}`;
+        document.getElementById("silverGst").textContent = `₹${gst.toFixed(2)}`;
+        document.getElementById("silverFinalPrice").textContent = finalPrice.toFixed(2);
+      }
+
+      document.getElementById("result").style.display = "block";
+    }
+
+    window.onload = toggleInputs; // Show Gold inputs by default
+  </script>
+</body>
+</html
