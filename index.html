@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>ZEVAR COLLECTION Receipt</title>
@@ -8,150 +9,148 @@
       font-family: 'Segoe UI', sans-serif;
       background: #fff;
       margin: 0;
-      padding: 10px;
+      padding: 0;
       color: #000;
-    }.receipt {
-  width: 58mm;
-  padding: 10px;
-  border-radius: 4px;
-  background: #fff;
-}
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-h1 {
-  font-size: 16px;
-  text-align: center;
-  margin: 0;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #000;
-}
+    .receipt {
+      width: 58mm;
+      padding: 10px;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
 
-.center, .right, .left {
-  font-size: 11px;
-}
+    h1 {
+      font-size: 16px;
+      text-align: center;
+      margin: 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #000;
+    }
 
-.center {
-  text-align: center;
-}
+    .center, .right, .left {
+      font-size: 11px;
+    }
 
-.right {
-  text-align: right;
-}
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .left { text-align: left; }
 
-.left {
-  text-align: left;
-}
+    .line {
+      border-top: 1px dashed #000;
+      margin: 6px 0;
+    }
 
-.line {
-  border-top: 1px dashed #000;
-  margin: 6px 0;
-}
+    .vrow {
+      margin: 4px 0;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+    }
 
-.row-mid {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  margin: 2px 0;
-}
+    .final {
+      font-size: 12px;
+      font-weight: bold;
+    }
 
-.final {
-  font-size: 12px;
-  font-weight: bold;
-}
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      margin-top: 6px;
+    }
 
-.footer {
-  text-align: center;
-  font-size: 10px;
-  margin-top: 6px;
-}
+    input, select, button {
+      width: 100%;
+      margin: 4px 0;
+      padding: 6px;
+      font-size: 12px;
+    }
 
-input, select, button {
-  width: 100%;
-  margin: 4px 0;
-  padding: 6px;
-  font-size: 12px;
-}
+    button {
+      background: gold;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
 
-button {
-  background: gold;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-}
+    .section {
+      margin-bottom: 6px;
+    }
 
-.section {
-  margin-bottom: 6px;
-}
-
-.vrow {
-  margin: 4px 0;
-  font-size: 11px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.label {
-  width: 55%;
-}
-
-.value {
-  width: 45%;
-  text-align: right;
-}
-
-@media print {
-  input, select, button { display: none !important; }
-  body { margin: 0; padding: 0; width: 58mm; }
-  .receipt { width: 100%; padding: 0; }
-}
-
+    @media print {
+      input, select, button { display: none !important; }
+      body {
+        display: block;
+        padding: 0;
+        margin: 0;
+        width: 58mm;
+      }
+      .receipt {
+        width: 100%;
+        padding: 0;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="receipt">
     <h1>ZEVAR COLLECTION</h1>
     <div class="center">GSTIN: 09BZVPS9215G1ZJ</div>
-    <div class="center" id="printDate"></div><input type="text" id="name" placeholder="Customer Name" />
-<input type="text" id="mobile" placeholder="Mobile Number" />
+    <div class="center" id="printDate"></div>
 
-<div id="item-form">
-  <input type="text" id="itemName" placeholder="Item Name" />
-  <select id="metalType">
-    <option value="gold">Gold</option>
-    <option value="silver">Silver</option>
-  </select>
-  <input type="number" id="weight" placeholder="Weight (g)" />
-  <input type="number" id="rate10g" placeholder="Rate (per 10g)" />
-  <select id="purity"></select>
-  <select id="making"></select>
-  <input type="number" id="discount" placeholder="Discount (%)" value="0" />
-  <button onclick="addItem()">➕ Add Item</button>
-</div>
+    <input type="text" id="name" placeholder="Customer Name" />
+    <input type="text" id="mobile" placeholder="Mobile Number" />
 
-<div class="line"></div>
-<div class="vrow"><b>👤 Name:</b><span id="printName"></span></div>
-<div class="vrow"><b>📞 Mobile:</b><span id="printMobile"></span></div>
-<div class="line"></div>
+    <div id="item-form">
+      <input type="text" id="itemName" placeholder="Item Name" />
+      <select id="metalType">
+        <option value="gold">Gold</option>
+        <option value="silver">Silver</option>
+      </select>
+      <input type="number" id="weight" placeholder="Weight (g)" />
+      <input type="number" id="rate10g" placeholder="Rate (per 10g)" />
+      <select id="purity"></select>
+      <select id="making"></select>
+      <input type="number" id="discount" placeholder="Discount (%)" value="0" />
+      <button onclick="addItem()">➕ Add Item</button>
+    </div>
 
-<div id="itemDetails"></div>
+    <input type="number" id="oldGold" placeholder="Old Gold Purchase ₹" />
+    <input type="number" id="oldSilver" placeholder="Old Silver Purchase ₹" />
+    <input type="number" id="cash" placeholder="Cash Paid (₹)" />
+    <input type="number" id="upi" placeholder="UPI Paid (₹)" />
 
-<div class="line"></div>
-<div class="vrow"><b>Subtotal</b><span>₹<span id="subtotal">0.00</span></span></div>
-<div class="vrow"><b>GST (3%)</b><span>₹<span id="gst">0.00</span></span></div>
-<div class="vrow final"><b>Total</b><span>₹<span id="total">0.00</span></span></div>
+    <div class="line"></div>
+    <div class="vrow"><b>👤 Name:</b><span id="printName"></span></div>
+    <div class="vrow"><b>📞 Mobile:</b><span id="printMobile"></span></div>
+    <div class="line"></div>
 
-<input type="number" id="cash" placeholder="Cash Paid (₹)" />
-<input type="number" id="upi" placeholder="UPI Paid (₹)" />
-<div class="vrow"><b>Paid</b><span>₹<span id="paid">0.00</span></span></div>
-<div class="vrow"><b>Due</b><span>₹<span id="due">0.00</span></span></div>
+    <div id="itemDetails"></div>
 
-<button onclick="window.print()">🖨️ Print</button>
+    <div class="line"></div>
+    <div class="vrow"><b>Subtotal</b><span>₹<span id="subtotal">0.00</span></span></div>
+    <div class="vrow"><b>GST (3%)</b><span>₹<span id="gst">0.00</span></span></div>
+    <div class="vrow" id="rowOldGold"><b>Old Gold (-)</b><span>₹<span id="printOldGold">0.00</span></span></div>
+    <div class="vrow" id="rowOldSilver"><b>Old Silver (-)</b><span>₹<span id="printOldSilver">0.00</span></span></div>
+    <div class="vrow final"><b>Total</b><span>₹<span id="total">0.00</span></span></div>
+    <div class="vrow" id="rowCash"><b>Cash</b><span>₹<span id="printCash">0.00</span></span></div>
+    <div class="vrow" id="rowUpi"><b>UPI</b><span>₹<span id="printUpi">0.00</span></span></div>
+    <div class="vrow"><b>Due</b><span>₹<span id="due">0.00</span></span></div>
 
-<div class="footer">
-  🙏 <strong>ZEVAR COLLECTION</strong> धन्यवाद<br>
-  <em>‘Sagai Se Vidai Tak – Aapka Bharosemand Royal Jewellery Brand’</em>
-</div>
+    <button onclick="window.print()">🖨️ Print</button>
 
-  </div>  <script>
+    <div class="footer">
+      🙏 <strong>ZEVAR COLLECTION</strong> धन्यवाद<br>
+      <em>‘Sagai Se Vidai Tak – Aapka Bharosemand Royal Jewellery Brand’</em>
+    </div>
+  </div>
+
+  <script>
     let items = [];
 
     function updatePurityOptions() {
@@ -196,14 +195,14 @@ button {
       const div = document.createElement("div");
       div.className = "section";
       div.innerHTML = `
-        <div class='vrow'><span class='label'><b>Item:</b> ${itemName}</span><span class='value'>(${metal})</span></div>
-        <div class='vrow'><span class='label'>Weight</span><span class='value'>${weight.toFixed(2)} g</span></div>
-        <div class='vrow'><span class='label'>Rate (per 10g)</span><span class='value'>₹${rate10g.toFixed(0)}</span></div>
-        <div class='vrow'><span class='label'>Fine Rate (${(purity * 1000).toFixed(0)})</span><span class='value'>₹${fineRate.toFixed(2)}</span></div>
-        <div class='vrow'><span class='label'>Metal Value</span><span class='value'>₹${metalValue.toFixed(2)}</span></div>
-        <div class='vrow'><span class='label'>Making (₹${making}/g)</span><span class='value'>₹${makingValue.toFixed(2)}</span></div>
-        <div class='vrow'><span class='label'>Discount (${discount}%)</span><span class='value'>-₹${discountValue.toFixed(2)}</span></div>
-        <div class='vrow'><span class='label'><b>Total</b></span><span class='value'><b>₹${total.toFixed(2)}</b></span></div>
+        <div class='vrow'><span><b>Item:</b> ${itemName}</span><span>(${metal})</span></div>
+        <div class='vrow'><span>Weight</span><span>${weight.toFixed(2)} g</span></div>
+        <div class='vrow'><span>Rate (per 10g)</span><span>₹${rate10g.toFixed(0)}</span></div>
+        <div class='vrow'><span>Fine Rate (${(purity * 1000).toFixed(0)})</span><span>₹${fineRate.toFixed(2)}</span></div>
+        <div class='vrow'><span>Metal Value</span><span>₹${metalValue.toFixed(2)}</span></div>
+        <div class='vrow'><span>Making (₹${making}/g)</span><span>₹${makingValue.toFixed(2)}</span></div>
+        <div class='vrow'><span>Discount (${discount}%)</span><span>-₹${discountValue.toFixed(2)}</span></div>
+        <div class='vrow'><b>Total</b><b>₹${total.toFixed(2)}</b></div>
         <div class='line'></div>
       `;
 
@@ -215,29 +214,44 @@ button {
     function updateTotals() {
       const subtotal = items.reduce((sum, item) => sum + item.total, 0);
       const gst = subtotal * 0.03;
-      const total = subtotal + gst;
+      const oldGold = parseFloat(document.getElementById("oldGold").value || 0);
+      const oldSilver = parseFloat(document.getElementById("oldSilver").value || 0);
+      const finalTotal = subtotal + gst - oldGold - oldSilver;
+
       const cash = parseFloat(document.getElementById("cash").value || 0);
       const upi = parseFloat(document.getElementById("upi").value || 0);
-      const paid = cash + upi;
-      const due = total - paid;
+      const due = finalTotal - (cash + upi);
 
       document.getElementById("subtotal").textContent = subtotal.toFixed(2);
       document.getElementById("gst").textContent = gst.toFixed(2);
-      document.getElementById("total").textContent = total.toFixed(2);
-      document.getElementById("paid").textContent = paid.toFixed(2);
+      document.getElementById("total").textContent = finalTotal.toFixed(2);
       document.getElementById("due").textContent = due.toFixed(2);
+
+      document.getElementById("printCash").textContent = cash.toFixed(2);
+      document.getElementById("printUpi").textContent = upi.toFixed(2);
+      document.getElementById("printOldGold").textContent = oldGold.toFixed(2);
+      document.getElementById("printOldSilver").textContent = oldSilver.toFixed(2);
+
+      document.getElementById("rowCash").style.display = cash ? "flex" : "none";
+      document.getElementById("rowUpi").style.display = upi ? "flex" : "none";
+      document.getElementById("rowOldGold").style.display = oldGold ? "flex" : "none";
+      document.getElementById("rowOldSilver").style.display = oldSilver ? "flex" : "none";
     }
 
     function setDateTime() {
       const now = new Date();
-      document.getElementById("printDate").textContent = `🕒 ${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      document.getElementById("printDate").textContent =
+        `🕒 ${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
 
     document.getElementById("metalType").addEventListener("change", updatePurityOptions);
     document.getElementById("cash").addEventListener("input", updateTotals);
     document.getElementById("upi").addEventListener("input", updateTotals);
+    document.getElementById("oldGold").addEventListener("input", updateTotals);
+    document.getElementById("oldSilver").addEventListener("input", updateTotals);
 
     updatePurityOptions();
     setDateTime();
-  </script></body>
+  </script>
+</body>
 </html>
