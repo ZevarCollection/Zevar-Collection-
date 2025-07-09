@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZEVAR COLLECTION Receipt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background: #f9f9f9;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 10px;
+      color: #000;
+    }
+    .receipt {
+      width: 58mm;
+      padding: 10px;
+      background: #fff;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      font-size: 16px;
+      text-align: center;
+      margin: 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #000;
+    }
+    .center, .right, .left {
+      font-size: 11px;
+    }
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .left { text-align: left; }
+    .line {
+      border-top: 1px dashed #000;
+      margin: 6px 0;
+    }
+    .vrow {
+      margin: 4px 0;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .label { width: 55%; }
+    .value { width: 45%; text-align: right; }
+    .final {
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      margin-top: 6px;
+    }
+    input, select, button {
+      width: 100%;
+      margin: 4px 0;
+      padding: 6px;
+      font-size: 12px;
+    }
+    button {
+      background: gold;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .section { margin-bottom: 6px; }
+
+    @media print {
+      html, body {
+        display: block;
+        background: #fff;
+      }
+      input, select, button { display: none !important; }
+      .receipt {
+        width: 58mm;
+        padding: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <h1>ZEVAR COLLECTION</h1>
+    <div class="center">GSTIN: 09BZVPS9215G1ZJ</div>
+    <div class="center" id="printDate"></div>
+
+    <input type="text" id="name" placeholder="Customer Name" />
+    <input type="text" id="mobile" placeholder="Mobile Number" />
+
+    <div id="item-form">
+      <input type="text" id="itemName" placeholder="Item Name" />
+      <select id="metalType">
+        <option value="gold">Gold</option>
+        <option value="silver">Silver</option>
+      </select>
+      <input type="number" id="weight" placeholder="Weight (g)" step="0.01" />
+      <input type="number" id="rate10g" placeholder="Rate (per 10g)" />
+      <select id="purity"></select>
+      <input type="number" id="making" placeholder="Making (per piece)" />
+      <input type="number" id="discount" placeholder="Discount (%)" value="0" />
+      <button onclick="addItem()">➕ Add Item</button>
+    </div>
+
+    <div class="line"></div>
+    <div class="vrow"><b>👤 Name:</b><span id="printName"></span></div>
+    <div class="vrow"><b>📞 Mobile:</b><span id="printMobile"></span></div>
+    <div class="line"></div>
+
+    <div id="itemDetails"></div>
+
+    <div class="line"></div>
+    <div class="vrow"><b>Subtotal</b><span>₹<span id="subtotal">0.00</span></span></div>
+    <div class="vrow"><b>GST (3%)</b><span>₹<span id="gst">0.00</span></span></div>
+    <div class="vrow" id="oldGoldRow"><b>Old Gold</b><span>-₹<span id="oldGoldShow">0.00</span></span></div>
+    <div class="vrow" id="oldSilverRow"><b>Old Silver</b><span>-₹<span id="oldSilverShow">0.00</span></span></div>
+    <div class="vrow final"><b>Total</b><span>₹<span id="total">0.00</span></span></div>
+
+    <input type="number" id="oldGold" placeholder="Old Gold Value (₹)" />
+    <input type="number" id="oldSilver" placeholder="Old Silver Value (₹)" />
+    <input type="number" id="cash" placeholder="Cash Paid (₹)" />
+    <input type="number" id="upi" placeholder="UPI Paid (₹)" />
+
+    <div id="paymentBreakdown"></div>
+    <div class="vrow" id="dueRow"><b>Due</b><span>₹<span id="due">0.00</span></span></div>
+
+    <button onclick="window.print()">🖨️ Print</button>
+
+    <div class="footer">
+      🙏 <strong>ZEVAR COLLECTION</strong> धन्यवाद<br>
+      <em>‘Sagai Se Vidai Tak – Aapka Bharosemand Royal Jewellery Brand’</em>
+    </div>
+  </div>
+
+  <script>
+    let items = [];
+
+    function updatePurityOptions() {
+      const metal = document.getElementById("metalType").value;
+      const purity = document.getElementById("purity");
+      purity.innerHTML = '';
+      if (metal === "gold") {
+        purity.innerHTML = `<option value="0.75">18K (750)</option><option value="0.916">22K (916)</option>`;
+        document.getElementById("making").placeholder = "Auto from weight";
+        document.getElementById("making").disabled = true;
+      } else {
+        purity.innerHTML = `<option value="0.65">15.6K (650)</option><option value="0.925">22.2K (925)</option>`;
+        document.getElementById("making").placeholder = "Enter manually";
+        document.getElementById("making").disabled = false;
+      }
+    }
+
+    function getGoldMakingCharge(weight) {
+      const slabs = [
+        [0.000, 0.051, 99], [0.051, 0.100, 149], [0.100, 0.150, 199],
+        [0.150, 0.200, 249], [0.200, 0.250, 299], [0.250, 0.300, 349],
+        [0.300, 0.350, 399], [0.350, 0.400, 449], [0.400, 0.450, 499],
+        [0.450, 0.500, 549], [0.500, 0.550, 599], [0.550, 0.600, 649],
+        [0.600, 0.650, 699], [0.650, 0.700, 749], [0.700, 0.750, 799],
+        [0.750, 0.800, 849], [0.800, 0.850, 899], [0.850, 0.900, 949],
+        [0.900, 0.950, 999]
+      ];
+      for (let [min, max, charge] of slabs) {
+        if (weight >= min && weight < max) return charge;
+      }
+      return 0;
+    }
+
+    function addItem() {
+      const itemName = document.getElementById("itemName").value;
+      const metal = document.getElementById("metalType").value;
+      const weight = parseFloat(document.getElementById("weight").value);
+      const rate10g = parseFloat(document.getElementById("rate10g").value);
+      const purity = parseFloat(document.getElementById("purity").value);
+      const discount = parseFloat(document.getElementById("discount").value);
+      const name = document.getElementById("name").value;
+      const mobile = document.getElementById("mobile").value;
+
+      let making = metal === "gold" ? getGoldMakingCharge(weight) : parseFloat(document.getElementById("making").value);
+
+      if (!itemName || !weight || !rate10g || !name || !mobile || isNaN(making)) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      document.getElementById("printName").textContent = name;
+      document.getElementById("printMobile").textContent = mobile;
+
+      const ratePerGram = rate10g / 10;
+      const fineRate = ratePerGram * purity;
+      const metalValue = fineRate * weight;
+      const discountValue = (discount / 100) * making;
+      const total = metalValue + making - discountValue;
+
+      const div = document.createElement("div");
+      div.className = "section";
+      div.innerHTML = `
+        <div class='vrow'><span class='label'><b>Item:</b> ${itemName}</span><span class='value'>(${metal})</span></div>
+        <div class='vrow'><span class='label'>Weight</span><span class='value'>${weight.toFixed(2)} g</span></div>
+        <div class='vrow'><span class='label'>Rate (per 10g)</span><span class='value'>₹${rate10g.toFixed(0)}</span></div>
+        <div class='vrow'><span class='label'>Fine Rate (${(purity * 1000).toFixed(0)})</span><span class='value'>₹${fineRate.toFixed(2)}</span></div>
+        <div class='vrow'><span class='label'>Metal Value</span><span class='value'>₹${metalValue.toFixed(2)}</span></div>
+        <div class='vrow'><span class='label'>Making (Per Piece)</span><span class='value'>₹${making.toFixed(2)}</span></div>
+        <div class='vrow'><span class='label'>Discount (${discount}%)</span><span class='value'>-₹${discountValue.toFixed(2)}</span></div>
+        <div class='vrow'><span class='label'><b>Total</b></span><span class='value'><b>₹${total.toFixed(2)}</b></span></div>
+        <div class='line'></div>
+      `;
+      document.getElementById("itemDetails").appendChild(div);
+      items.push({ total });
+      updateTotals();
+    }
+
+    function updateTotals() {
+      const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+      const gst = subtotal * 0.03;
+      const oldGold = parseFloat(document.getElementById("oldGold").value || 0);
+      const oldSilver = parseFloat(document.getElementById("oldSilver").value || 0);
+      const total = subtotal + gst - oldGold - oldSilver;
+      const cash = parseFloat(document.getElementById("cash").value || 0);
+      const upi = parseFloat(document.getElementById("upi").value || 0);
+      const paid = cash + upi;
+      const due = total - paid;
+
+      document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+      document.getElementById("gst").textContent = gst.toFixed(2);
+      document.getElementById("oldGoldShow").textContent = oldGold.toFixed(2);
+      document.getElementById("oldSilverShow").textContent = oldSilver.toFixed(2);
+      document.getElementById("total").textContent = total.toFixed(2);
+      document.getElementById("due").textContent = due.toFixed(2);
+
+      document.getElementById("oldGoldRow").style.display = oldGold > 0 ? "flex" : "none";
+      document.getElementById("oldSilverRow").style.display = oldSilver > 0 ? "flex" : "none";
+
+      const paymentDiv = document.getElementById("paymentBreakdown");
+      paymentDiv.innerHTML = "";
+      if (upi > 0) paymentDiv.innerHTML += `<div class="vrow"><b>UPI Paid</b><span>₹${upi.toFixed(2)}</span></div>`;
+      if (cash > 0) paymentDiv.innerHTML += `<div class="vrow"><b>Cash Paid</b><span>₹${cash.toFixed(2)}</span></div>`;
+    }
+
+    function setDateTime() {
+      const now = new Date();
+      document.getElementById("printDate").textContent =
+        `🕒 ${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    document.getElementById("metalType").addEventListener("change", updatePurityOptions);
+    document.getElementById("cash").addEventListener("input", updateTotals);
+    document.getElementById("upi").addEventListener("input", updateTotals);
+    document.getElementById("oldGold").addEventListener("input", updateTotals);
+    document.getElementById("oldSilver").addEventListener("input", updateTotals);
+
+    updatePurityOptions();
+    setDateTime();
+  </script>
+</body>
+</html>
